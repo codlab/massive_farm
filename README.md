@@ -1,2 +1,3 @@
-# massive_farm
-Easy and reliable lil farming environment for tests
+# massive farm
+
+Wrapper around adb to provide an example of interactions. In the future, an injectable environment ?
