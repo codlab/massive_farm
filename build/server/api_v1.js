@@ -7,6 +7,9 @@ const express_1 = require("express");
 const adbkit_1 = __importDefault(require("adbkit"));
 var client = adbkit_1.default.createClient();
 const router = express_1.Router();
+function delay(value, time) {
+    return new Promise((resolve) => setTimeout(() => resolve(value), time));
+}
 router.get("/:id/status.json", (req, res) => {
     client.startActivity(req.params.id, {
         wait: true,
@@ -15,8 +18,20 @@ router.get("/:id/status.json", (req, res) => {
             status: true
         }
     })
-        .then(done => {
-        res.json({ done });
+        .then(done => delay(done, 100))
+        .then(done => client.pull(req.params.id, "/storage/emulated/0/Android/data/com.voxeet.sample/cache/status.json"))
+        .then(stream => {
+        var content = "";
+        stream.on("data", data => content += data);
+        stream.on("end", () => {
+            try {
+                content = JSON.parse(content);
+            }
+            catch (e) {
+                content = "invalid";
+            }
+            res.json({ content });
+        });
     })
         .catch(err => {
         console.error(err);
