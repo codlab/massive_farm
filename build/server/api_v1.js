@@ -1,37 +1,78 @@
 "use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-}
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const adbkit_1 = __importDefault(require("adbkit"));
-var client = adbkit_1.default.createClient();
+const adb_1 = require("../adb");
 const router = express_1.Router();
-function delay(value, time) {
-    return new Promise((resolve) => setTimeout(() => resolve(value), time));
+const client = new adb_1.Client();
+const activity = client.activity();
+router.get("/:id/create/:conferenceAlias.json", (req, res) => {
+    activity.startActivity(req.params.id, {
+        action: "create",
+        codec: req.params.codec || "h264",
+        conferenceAlias: req.params.conferenceAlias || null
+    })
+        .then(result => res.json({ result }))
+        .catch(err => {
+        console.error(err);
+        res.json({ error: "catch" });
+    });
+});
+router.get("/:id/join/:conference.json", (req, res) => {
+    activity.startActivity(req.params.id, {
+        action: "join",
+        conferenceId: req.params.conferenceId || ""
+    })
+        .then(result => res.json({ result }))
+        .catch(err => {
+        console.error(err);
+        res.json({ error: "catch" });
+    });
+});
+function actionNoParameter(action) {
+    return (req, res) => {
+        activity.startActivity(req.params.id, { action })
+            .then(result => res.json({ result }))
+            .catch(err => {
+            console.error(err);
+            res.json({ error: "catch" });
+        });
+    };
+}
+router.get("/:id/startVideo.json", actionNoParameter("startVideo"));
+router.get("/:id/stopVideo.json", actionNoParameter("stopVideo"));
+function getFile(id, filePath) {
+    return new Promise((resolve, reject) => {
+        activity.startActivity(id)
+            .then(done => client.pull(id, filePath))
+            .then((stream) => {
+            var content = "";
+            stream.on("data", data => content += data);
+            stream.on("end", () => {
+                try {
+                    content = JSON.parse(content);
+                }
+                catch (e) {
+                    content = "invalid";
+                }
+                resolve(content);
+            });
+        });
+    });
 }
 router.get("/:id/status.json", (req, res) => {
-    client.startActivity(req.params.id, {
-        wait: true,
-        action: "com.voxeet.intent.action.TEST_ACTION",
-        extras: {
-            status: true
-        }
+    getFile(req.params.id, "/storage/emulated/0/Android/data/com.voxeet.sample/cache/status.json")
+        .then(content => {
+        res.json({ content });
     })
-        .then(done => delay(done, 100))
-        .then(done => client.pull(req.params.id, "/storage/emulated/0/Android/data/com.voxeet.sample/cache/status.json"))
-        .then(stream => {
-        var content = "";
-        stream.on("data", data => content += data);
-        stream.on("end", () => {
-            try {
-                content = JSON.parse(content);
-            }
-            catch (e) {
-                content = "invalid";
-            }
-            res.json({ content });
-        });
+        .catch(err => {
+        console.error(err);
+        res.json({ error: "catch" });
+    });
+});
+router.get("/:id/webrtc.json", (req, res) => {
+    getFile(req.params.id, "/storage/emulated/0/Android/data/com.voxeet.sample/cache/webrtc.json")
+        .then(content => {
+        res.json({ content });
     })
         .catch(err => {
         console.error(err);
@@ -43,7 +84,7 @@ router.get("/devices.json", (req, res) => {
         .then(devices => {
         return Promise.all(devices.map(d => client.getProperties(d.id)))
             .then((properties) => {
-            properties = properties.map((p) => {
+            var props = properties.map((p) => {
                 return {
                     "brand": p["ro.product.brand"],
                     "manufacturer": p["ro.product.manufacturer"],
@@ -51,9 +92,9 @@ router.get("/devices.json", (req, res) => {
                 };
             });
             devices = devices.map((device, index) => {
-                return Object.assign({}, device, { infos: index < properties.length ? properties[index] : {} });
+                return Object.assign({}, device, { infos: index < props.length ? props[index] : {} });
             });
-            res.json({ devices });
+            res.json(devices);
         });
     })
         .catch(err => {
