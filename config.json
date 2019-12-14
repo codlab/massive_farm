@@ -1,0 +1,35 @@
+{
+    "routes": [
+        {
+            "url": "/:id/status.json",
+            "path": "/storage/emulated/0/Android/data/com.voxeet.sample/cache/status.json"
+        },
+        {
+            "url": "/:id/webrtc.json",
+            "path": "/storage/emulated/0/Android/data/com.voxeet.sample/cache/webrtc.json"
+        },
+        {
+            "url": "/:id/create/:conferenceAlias.json",
+            "action": "create",
+            "options": [
+                { "key": "codec", "default": "h264"},
+                { "key": "conferenceAlias", "default": null}
+            ]
+        },
+        {
+            "url": "/:id/join/:conference.json",
+            "action": "join",
+            "options": [
+                { "key": "conferenceId", "default": ""}
+            ]
+        },
+        {
+            "url": "/:id/startVideo.json",
+            "action": "startVideo"
+        },
+        {
+            "url": "/:id/stopVideo.json",
+            "action": "stopVideo"
+        }
+    ]
+}
