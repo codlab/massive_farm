@@ -1,7 +1,4 @@
-export interface Device {
-    id: string;
-    type: "device" | "emulator";
-}
+import { Device } from "adbkit";
 export default class _Internal {
     constructor();
     id(id: string | Device): string;

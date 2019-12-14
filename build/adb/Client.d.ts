@@ -1,11 +1,8 @@
+/// <reference path="../../app/adb/adbkit.d.ts" />
+import { Device, Properties } from "adbkit";
 import Activity from "./Activity";
 import { Stream } from "stream";
-import _Internal, { Device } from "./_Internal";
-export interface Properties {
-    "ro.product.brand": string;
-    "ro.product.manufacturer": string;
-    "ro.product.model": string;
-}
+import _Internal from "./_Internal";
 export default class Client extends _Internal {
     private _activity;
     private _client;

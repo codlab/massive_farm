@@ -7,7 +7,9 @@ class _Internal {
         if (id.id) {
             return id.id;
         }
-        return id;
+        else {
+            return id;
+        }
     }
     delay(value, time) {
         return new Promise((resolve) => setTimeout(() => resolve(value), time));
