@@ -8,10 +8,10 @@ export default class Activity extends _Internal {
     this._client = client;
   }
 
-  startActivity(id: string, optionals?: any): Promise<boolean> {
+  startActivity(id: string, action: string, optionals?: any): Promise<boolean> {
     return this._client.startActivity(id, {
       wait: true,
-      action: "com.voxeet.intent.action.TEST_ACTION",
+      action,
       extras: {
         status: true,
         ...optionals

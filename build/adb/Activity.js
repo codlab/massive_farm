@@ -10,10 +10,10 @@ class Activity extends _Internal_1.default {
         this.shell = (id, command) => this._client.shell(id, command);
         this._client = client;
     }
-    startActivity(id, optionals) {
+    startActivity(id, action, optionals) {
         return this._client.startActivity(id, {
             wait: true,
-            action: "com.voxeet.intent.action.TEST_ACTION",
+            action,
             extras: Object.assign({ status: true }, optionals)
         });
     }

@@ -29,20 +29,20 @@ export default class APIv1 {
 
   private getFile(id: string, filePath: string) {
     return new Promise((resolve, reject) => {
-      activity.startActivity(id)
+      activity.startActivity(id, config.activity.action)
       .then(done => client.pull(id, filePath))
       .then((stream: Stream) => {
         var content = "";
         stream.on("data", data => content += data);
         stream.on("end", () => {
           try {
-            content = JSON.parse(content);
+            resolve(JSON.parse(content));
           } catch(e) {
-            content = "invalid";
+            resolve({error:"invalid"});
           }
-          resolve(content);
         })
-      });
+      })
+      .catch(err => reject(err));
     });
   }
 
@@ -70,7 +70,7 @@ export default class APIv1 {
         opt[option.key] = req.params[option.key] || def;
       });
   
-      activity.startActivity(req.params.id, opt)
+      activity.startActivity(req.params.id, config.activity.action, opt)
       .then(result => res.json(result))
       .catch(err => {
         console.error(err);

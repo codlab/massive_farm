@@ -14,21 +14,21 @@ class APIv1 {
     }
     getFile(id, filePath) {
         return new Promise((resolve, reject) => {
-            activity.startActivity(id)
+            activity.startActivity(id, config.activity.action)
                 .then(done => client.pull(id, filePath))
                 .then((stream) => {
                 var content = "";
                 stream.on("data", data => content += data);
                 stream.on("end", () => {
                     try {
-                        content = JSON.parse(content);
+                        resolve(JSON.parse(content));
                     }
                     catch (e) {
-                        content = "invalid";
+                        resolve({ error: "invalid" });
                     }
-                    resolve(content);
                 });
-            });
+            })
+                .catch(err => reject(err));
         });
     }
     createFile(url, path) {
@@ -52,7 +52,7 @@ class APIv1 {
                 const def = option.def ? options[option.def] : null;
                 opt[option.key] = req.params[option.key] || def;
             });
-            activity.startActivity(req.params.id, opt)
+            activity.startActivity(req.params.id, config.activity.action, opt)
                 .then(result => res.json(result))
                 .catch(err => {
                 console.error(err);
