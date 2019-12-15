@@ -1,6 +1,6 @@
 {
   "name": "massive_farm",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "description": "interact with devices",
   "main": "build/index.js",
   "scripts": {

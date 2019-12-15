@@ -55,4 +55,19 @@ export default class Lock {
 
     return Promise.reject("can't hold on a reserved id");
   }
+
+  release(id: string, code: string): Promise<boolean> {
+    var countDown: CountDown|null = null;
+
+    if(this.locks.has(id)) {
+      countDown = this.locks.get(id) || {code, remaining: 0};
+      //reset if matching codes
+      if(countDown.code == code) {
+        this.locks.delete(id);
+        return Promise.resolve(true);
+      }
+    }
+
+    return Promise.reject("can't release");
+  }
 }
