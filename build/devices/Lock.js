@@ -44,6 +44,18 @@ class Lock {
         }
         return Promise.reject("can't hold on a reserved id");
     }
+    release(id, code) {
+        var countDown = null;
+        if (this.locks.has(id)) {
+            countDown = this.locks.get(id) || { code, remaining: 0 };
+            //reset if matching codes
+            if (countDown.code == code) {
+                this.locks.delete(id);
+                return Promise.resolve(true);
+            }
+        }
+        return Promise.reject("can't release");
+    }
 }
 Lock.instance = new Lock();
 exports.default = Lock;

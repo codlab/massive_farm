@@ -100,6 +100,17 @@ class APIv1 {
                 .then(result => res.json({ result }))
                 .catch(err => res.json({ error: "can't hold" }));
         });
+        this._router.post("/:id/unlock.json", (req, res) => {
+            var { id } = req.params;
+            var { code } = req.body;
+            if (!code || !id) {
+                res.json({ error: "can't release" });
+                return;
+            }
+            Lock_1.default.instance.release(id || "", code || "")
+                .then(result => res.json({ result }))
+                .catch(err => res.json({ error: "can't release" }));
+        });
     }
     initRoutes() {
         config.routes && config.routes.forEach(route => {
