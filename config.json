@@ -15,15 +15,15 @@
             "url": "/:id/create/:conferenceAlias.json",
             "action": "create",
             "options": [
-                { "key": "codec", "default": "h264"},
-                { "key": "conferenceAlias", "default": null}
+                { "key": "codec", "def": "h264"},
+                { "key": "conferenceAlias", "def": null}
             ]
         },
         {
             "url": "/:id/join/:conference.json",
             "action": "join",
             "options": [
-                { "key": "conferenceId", "default": ""}
+                { "key": "conferenceId", "def": ""}
             ]
         },
         {

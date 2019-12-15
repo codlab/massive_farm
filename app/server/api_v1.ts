@@ -2,8 +2,10 @@ import { Router } from "express";
 import { IncomingHttpHeaders } from "http";
 import { Client, Activity } from "../adb";
 import { Stream } from "stream";
+import Config, { RouteFile, RouteAction, Option } from "./Config";
+import Lock from "../devices/Lock";
 
-const config = require("../../config.json");
+const config: Config = require("../../config.json");
 
 interface Req {
   headers: IncomingHttpHeaders
@@ -11,11 +13,6 @@ interface Req {
 
 const client: Client = new Client();
 const activity: Activity = client.activity();
-
-export interface Option {
-  key: string,
-  def?: string
-}
 
 export default class APIv1 {
 
@@ -60,7 +57,7 @@ export default class APIv1 {
     });
   }
   
-  private createAction(url: string, action: string, options: Option[]) {
+  private createAction(url: string, action: string, options?: Option[]) {
     console.log(`create file action on ${url} for action ${action}`);
     this._router.get(url, (req, res) => {
       const opt = { action };
@@ -85,6 +82,7 @@ export default class APIv1 {
       .then(devices => {
         return Promise.all(devices.map(d => client.getProperties(d.id)))
         .then(properties => {
+          const lock: Lock = Lock.instance;
           var props:any = properties.map(p => {
             return {
               "brand": p["ro.product.brand"],
@@ -96,7 +94,8 @@ export default class APIv1 {
           devices = devices.map((device, index) => {
             return {
               ...device,
-              infos: index < props.length ? props[index]: {}
+              infos: index < props.length ? props[index]: {},
+              available: lock.available(device.id || "")
             }
           });
           res.json(devices);
@@ -106,17 +105,30 @@ export default class APIv1 {
         console.warn(err);
         res.json({});
       })
-    })
+    });
+
+    this._router.post("/:id/lock.json", (req, res) => {
+      var { id } = req.params;
+      var { code } = req.body;
+      if(!code || !id) {
+        res.json({error: "can't hold"});
+        return;
+      }
+      Lock.instance.reserve(id || "", code || "")
+      .then(result => res.json({result}))
+      .catch(err => res.json({error: "can't hold"}));
+    });
   }
 
   private initRoutes() {
     config.routes && config.routes.forEach(route => {
-      if(route.path) {
-        this.createFile(route.url, route.path);
-      } else if(route.action) {
-        this.createAction(route.url, route.action, route.options);
+      if((route as RouteFile).path) {
+        this.createFile(route.url, (route as RouteFile).path);
+      } else if((route as RouteAction).action) {
+        const action = route as RouteAction;
+        this.createAction(route.url, action.action, action.options);
       } else {
-        console.log("unknown action " + route.type);
+        console.log("unknown action ", route);
       }
     });
   }

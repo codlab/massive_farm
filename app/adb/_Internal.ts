@@ -6,8 +6,8 @@ export default class _Internal {
   }
 
   public id(id: string|Device): string {
-    if((<Device> id).id) {
-      return (<Device> id).id;
+    if((id as Device).id) {
+      return (id as Device).id;
     } else {
       return <string> id;
     }
