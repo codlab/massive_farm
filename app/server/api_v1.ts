@@ -37,7 +37,7 @@ export default class APIv1 {
           } catch(e) {
             resolve({error:"invalid"});
           }
-        })
+        });
       })
       .catch(err => reject(err));
     });
@@ -52,7 +52,7 @@ export default class APIv1 {
       })
       .catch(err => {
         console.error(err);
-        res.json({error: "catch"})
+        res.status(404).json({error: "catch"})
       });
     });
   }
@@ -71,7 +71,7 @@ export default class APIv1 {
       .then(result => res.json(result))
       .catch(err => {
         console.error(err);
-        res.json({error: "catch"})
+        res.status(400).json({error: "catch"})
       });
     });
   }
@@ -103,7 +103,7 @@ export default class APIv1 {
       })
       .catch(err => {
         console.warn(err);
-        res.json({});
+        res.status(400).json({});
       })
     });
 
@@ -111,24 +111,24 @@ export default class APIv1 {
       var { id } = req.params;
       var { code } = req.body;
       if(!code || !id) {
-        res.json({error: "can't hold"});
+        res.status(400).json({error: "can't hold"});
         return;
       }
       Lock.instance.reserve(id || "", code || "")
       .then(result => res.json({result}))
-      .catch(err => res.json({error: "can't hold"}));
+      .catch(err => res.status(400).json({error: "can't hold"}));
     });
 
     this._router.post("/:id/unlock.json", (req, res) => {
       var { id } = req.params;
       var { code } = req.body;
       if(!code || !id) {
-        res.json({error: "can't release"});
+        res.status(400).json({error: "can't release"});
         return;
       }
       Lock.instance.release(id || "", code || "")
       .then(result => res.json({result}))
-      .catch(err => res.json({error: "can't release"}));
+      .catch(err => res.status(400).json({error: "can't release"}));
     });
   }
 
