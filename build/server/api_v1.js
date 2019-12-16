@@ -38,7 +38,12 @@ class APIv1 {
     createFile(url, path) {
         console.log(`create file action on ${url} for path ${path}`);
         this._router.get(url, (req, res) => {
-            this.getFile(req.params.id, path)
+            const { code, id } = req.params;
+            if (!Lock_1.default.instance.valid(id, code)) {
+                res.status(400).json({ error: "invalid session" });
+                return;
+            }
+            this.getFile(id, path)
                 .then(content => {
                 res.json(content);
             })
@@ -51,12 +56,17 @@ class APIv1 {
     createAction(url, action, options) {
         console.log(`create file action on ${url} for action ${action}`);
         this._router.get(url, (req, res) => {
+            const { code, id } = req.params;
+            if (!Lock_1.default.instance.valid(id, code)) {
+                res.status(400).json({ error: "invalid session" });
+                return;
+            }
             const opt = { action };
             options && options.forEach(option => {
                 const def = option.def ? options[option.def] : null;
                 opt[option.key] = req.params[option.key] || def;
             });
-            activity.startActivity(req.params.id, config.activity.action, opt)
+            activity.startActivity(id, config.activity.action, opt)
                 .then(result => res.json(result))
                 .catch(err => {
                 console.error(err);

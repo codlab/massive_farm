@@ -29,6 +29,14 @@ export default class Lock {
     list.forEach(key => this.locks.delete(key));
   }
 
+  valid(id: string, code: string): boolean {
+    if(this.locks.has(id)) {
+      var countDown: CountDown|undefined = this.locks.get(id);
+      return !!countDown && (countDown.code == code) && (countDown.remaining > 0);
+    }
+    return false;
+  }
+
   available(id: string): boolean {
     if(this.locks.has(id)) {
       var countDown: CountDown|undefined = this.locks.get(id);

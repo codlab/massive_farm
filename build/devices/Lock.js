@@ -20,6 +20,13 @@ class Lock {
         });
         list.forEach(key => this.locks.delete(key));
     }
+    valid(id, code) {
+        if (this.locks.has(id)) {
+            var countDown = this.locks.get(id);
+            return !!countDown && (countDown.code == code) && (countDown.remaining > 0);
+        }
+        return false;
+    }
     available(id) {
         if (this.locks.has(id)) {
             var countDown = this.locks.get(id);
