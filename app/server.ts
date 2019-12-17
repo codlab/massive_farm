@@ -3,12 +3,14 @@ import body_parser from "body-parser";
 import { Server } from "http";
 
 import APIv1 from "./server/api_v1";
+import DiscoveryService from "./discovery";
 
 export default class ApiServer {
 
   app?: Express;
   server?: Server;
   api_v1: APIv1 = new APIv1();
+  discovery?: DiscoveryService;
 
   start() {
     if(this.app) {
@@ -16,6 +18,8 @@ export default class ApiServer {
       return false;
     }
     this.app = express();
+    this.discovery = new DiscoveryService();
+    this.discovery.bind();
   
     this.app
     .use(body_parser.json())

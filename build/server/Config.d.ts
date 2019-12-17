@@ -15,7 +15,12 @@ export interface RouteAction {
     options?: Option[];
 }
 export declare type Route = RouteFile | RouteAction;
+export interface Server {
+    discovery: boolean;
+    port: number;
+}
 export default interface Config {
+    server: Server;
     activity: Activity;
     routes: Route[];
 }

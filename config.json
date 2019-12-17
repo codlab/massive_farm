@@ -1,4 +1,8 @@
 {
+    "server": {
+        "discovery": true,
+        "port": 8080
+    },
     "activity": {
         "action": "com.voxeet.intent.action.TEST_ACTION"
     },
