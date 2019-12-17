@@ -4,6 +4,7 @@ import { Client, Activity } from "../adb";
 import { Stream } from "stream";
 import Config, { RouteFile, RouteAction, Option } from "./Config";
 import Lock from "../devices/Lock";
+import { Properties } from "adbkit";
 
 const config: Config = require("../../config.json");
 
@@ -90,11 +91,19 @@ export default class APIv1 {
     });
   }
 
+  getProperties(deviceId: string): Promise<Properties> {
+    return client.getProperties(deviceId)
+    .catch(err => {
+      console.error(`get properties for ${deviceId}`, err);
+      return {};
+    })
+  }
+
   private initDevices() {
     this._router.get("/devices.json", (req, res) => {
       client.listDevices()
       .then(devices => {
-        return Promise.all(devices.map(d => client.getProperties(d.id)))
+        return Promise.all(devices.map(d => this.getProperties(d.id)))
         .then(properties => {
           const lock: Lock = Lock.instance;
           var props:any = properties.map(p => {

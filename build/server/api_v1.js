@@ -74,11 +74,18 @@ class APIv1 {
             });
         });
     }
+    getProperties(deviceId) {
+        return client.getProperties(deviceId)
+            .catch(err => {
+            console.error(`get properties for ${deviceId}`, err);
+            return {};
+        });
+    }
     initDevices() {
         this._router.get("/devices.json", (req, res) => {
             client.listDevices()
                 .then(devices => {
-                return Promise.all(devices.map(d => client.getProperties(d.id)))
+                return Promise.all(devices.map(d => this.getProperties(d.id)))
                     .then(properties => {
                     const lock = Lock_1.default.instance;
                     var props = properties.map(p => {
