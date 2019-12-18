@@ -4,6 +4,9 @@ import { Server } from "http";
 
 import APIv1 from "./server/api_v1";
 import DiscoveryService from "./discovery";
+import Config from "./server/Config";
+
+const config: Config = require("../config.json");
 
 export default class ApiServer {
 
@@ -18,7 +21,7 @@ export default class ApiServer {
       return false;
     }
     this.app = express();
-    this.discovery = new DiscoveryService();
+    this.discovery = new DiscoveryService(config && config.server ? config.server.mode : null);
     this.discovery.bind();
   
     this.app
