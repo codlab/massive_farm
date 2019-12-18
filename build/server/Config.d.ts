@@ -18,6 +18,7 @@ export declare type Route = RouteFile | RouteAction;
 export interface Server {
     discovery: boolean;
     port: number;
+    mode?: "master" | "slave" | "normal";
 }
 export default interface Config {
     server: Server;

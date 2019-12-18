@@ -1,5 +1,17 @@
+export declare type Mode = "normal" | "slave" | "master" | null | undefined;
+export interface OnServerFound {
+    (address: string, port: number): void;
+}
 export default class DiscoveryService {
     _bound: boolean;
-    constructor();
+    private sockets;
+    private mode;
+    private interfaces;
+    constructor(mode?: Mode);
     bind(): void;
+    private _masterLoop;
+    private initMaster();
+    private broadcastAddress(interf);
+    private bindSearch(interf);
+    private bindServer(port);
 }
