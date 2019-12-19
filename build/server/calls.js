@@ -16,6 +16,7 @@ const precall = (url, method, qs, json) => {
         options.qs = qs || undefined;
     return new Promise((resolve, reject) => {
         request_1.default(options, (e, resp, body) => {
+            console.log(body);
             try {
                 if (typeof body == "string") {
                     body = JSON.parse(body);
@@ -23,6 +24,7 @@ const precall = (url, method, qs, json) => {
             }
             catch (e) {
                 //error ?
+                console.log(e);
             }
             if (body && !body.error && resp.code != 401)
                 resolve(body);

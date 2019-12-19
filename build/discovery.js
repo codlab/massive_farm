@@ -10,7 +10,7 @@ const config = require("../config.json");
 const PORT_SLAVE = 1733;
 const PORT_SERVER = 1732;
 class DiscoveryService {
-    constructor(mode) {
+    constructor(listener, mode) {
         this._bound = false;
         this.sockets = [];
         this.interfaces = new Map();
@@ -28,6 +28,7 @@ class DiscoveryService {
         };
         this._bound = false;
         this.mode = mode;
+        this.listener = listener;
     }
     bind() {
         if (this._bound)
@@ -39,6 +40,10 @@ class DiscoveryService {
                 break;
             case "master":
                 this.initMaster();
+                if (config.server.discovery) {
+                    this.bindServer(PORT_SERVER);
+                }
+                break;
             case null:
             case undefined:
             default:
@@ -67,6 +72,14 @@ class DiscoveryService {
             try {
                 const json = JSON.parse(message.toString());
                 console.log("received..." + rinfo.address + " " + rinfo.port, json);
+                if (json && json.service && json.service == "massive_farm" && json.data && json.data.port) {
+                    const port = parseInt(json.data.port);
+                    try {
+                        this.listener && this.listener(rinfo.address, port);
+                    }
+                    catch (e) {
+                    }
+                }
             }
             catch (e) {
                 console.log("received invalid");
