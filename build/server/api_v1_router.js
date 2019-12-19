@@ -74,11 +74,13 @@ class APIv1Router {
         this._router.get(url, (req, res) => {
             const { code, id } = req.params;
             if (!Lock_1.default.instance.valid(id, code)) {
+                console.log("invalid session");
                 res.status(400).json({ error: "invalid session" });
                 return;
             }
             const server = this.findServer(id);
             if (!server) {
+                console.log("invalid server");
                 res.status(404).json({ error: "invalid server" });
                 return;
             }
@@ -89,7 +91,10 @@ class APIv1Router {
             console.log("forwarding to " + url, params);
             calls_1.default.get(forwarded, params)
                 .then(result => res.json(result))
-                .catch(err => res.status(400).json({ error: "can't release" }));
+                .catch(err => {
+                console.log("can't release", err);
+                res.status(400).json({ error: "can't release" });
+            });
         });
     }
     findServer(deviceId) {
@@ -117,11 +122,13 @@ class APIv1Router {
             var { id } = req.params;
             var { code } = req.body;
             if (!code || !id) {
+                console.log("can't hold");
                 res.status(400).json({ error: "can't hold" });
                 return;
             }
             const server = this.findServer(id);
             if (!server) {
+                console.log("invalid server");
                 res.status(404).json({ error: "invalid server" });
                 return;
             }
@@ -129,17 +136,22 @@ class APIv1Router {
             console.log("forward to " + url, { code });
             calls_1.default.post(url, { code })
                 .then(result => res.json(result))
-                .catch(err => res.status(400).json({ error: "can't hold" }));
+                .catch(err => {
+                console.log("can't release", err);
+                res.status(400).json({ error: "can't hold" });
+            });
         });
         this._router.post("/:id/unlock.json", (req, res) => {
             var { id } = req.params;
             var { code } = req.body;
             if (!code || !id) {
+                console.log("can't release");
                 res.status(400).json({ error: "can't release" });
                 return;
             }
             const server = this.findServer(id);
             if (!server) {
+                console.log("invalid server");
                 res.status(404).json({ error: "invalid server" });
                 return;
             }
@@ -147,7 +159,10 @@ class APIv1Router {
             console.log("forward to " + url, { code });
             calls_1.default.post(url, { code })
                 .then(result => res.json(result))
-                .catch(err => res.status(400).json({ error: "can't release" }));
+                .catch(err => {
+                console.log("can't release", err);
+                res.status(400).json({ error: "can't release" });
+            });
         });
     }
     initRoutes() {

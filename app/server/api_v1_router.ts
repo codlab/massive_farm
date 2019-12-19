@@ -98,12 +98,14 @@ export default class APIv1Router {
       
 
       if(!Lock.instance.valid(id, code)) {
+        console.log("invalid session");
         res.status(400).json({error: "invalid session"});
         return;
       }
 
       const server: Server|undefined = this.findServer(id);
       if(!server) {
+        console.log("invalid server");
         res.status(404).json({error: "invalid server"});
         return;
       }
@@ -115,7 +117,10 @@ export default class APIv1Router {
 
       calls.get(forwarded, params)
       .then(result => res.json(result))
-      .catch(err => res.status(400).json({error: "can't release" }));
+      .catch(err => {
+        console.log("can't release", err);
+        res.status(400).json({error: "can't release" })
+      });
     });
   }
 
@@ -147,12 +152,14 @@ export default class APIv1Router {
       var { code } = req.body;
 
       if(!code || !id) {
+        console.log("can't hold");
         res.status(400).json({error: "can't hold"});
         return;
       }
 
       const server: Server|undefined = this.findServer(id);
       if(!server) {
+        console.log("invalid server");
         res.status(404).json({error: "invalid server"});
         return;
       }
@@ -161,19 +168,24 @@ export default class APIv1Router {
       console.log("forward to " + url, {code});
       calls.post(url, {code})
       .then(result => res.json(result))
-      .catch(err => res.status(400).json({error: "can't hold" }));
+      .catch(err => {
+        console.log("can't release", err);
+        res.status(400).json({error: "can't hold" })
+      });
     });
 
     this._router.post("/:id/unlock.json", (req, res) => {
       var { id } = req.params;
       var { code } = req.body;
       if(!code || !id) {
+        console.log("can't release");
         res.status(400).json({error: "can't release"});
         return;
       }
 
       const server: Server|undefined = this.findServer(id);
       if(!server) {
+        console.log("invalid server");
         res.status(404).json({error: "invalid server"});
         return;
       }
@@ -182,7 +194,10 @@ export default class APIv1Router {
       console.log("forward to " + url, {code});
       calls.post(url, {code})
       .then(result => res.json(result))
-      .catch(err => res.status(400).json({error: "can't release" }));
+      .catch(err => {
+        console.log("can't release", err);
+        res.status(400).json({error: "can't release" })
+      });
     });
   }
 

@@ -6,8 +6,9 @@ export default class DiscoveryService {
     _bound: boolean;
     private sockets;
     private mode;
+    private listener?;
     private interfaces;
-    constructor(mode?: Mode);
+    constructor(listener?: OnServerFound, mode?: Mode);
     bind(): void;
     private _masterLoop;
     private initMaster();
