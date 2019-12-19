@@ -19,12 +19,14 @@ export default class DiscoveryService {
   _bound: boolean = false;
   private sockets: Socket[] = [];
   private mode: Mode;
+  private listener ?: OnServerFound;
 
   private interfaces: Map<string, Socket> = new Map();
 
-  constructor(mode?: Mode) {
+  constructor(listener?: OnServerFound, mode?: Mode) {
     this._bound = false;
     this.mode = mode;
+    this.listener = listener;
   }
 
   bind() {
@@ -85,6 +87,14 @@ export default class DiscoveryService {
       try {
         const json = JSON.parse(message.toString());
         console.log("received..." + rinfo.address+" "+rinfo.port, json);
+        if(json && json.service && json.service == "massive_farm" && json.data && json.data.port) {
+          const port = parseInt(json.data.port);
+          try {
+            this.listener && this.listener(rinfo.address, port);
+          } catch(e) {
+
+          }
+        }
       } catch(e) {
         console.log("received invalid");
       }
