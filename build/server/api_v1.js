@@ -58,7 +58,7 @@ class APIv1 {
         console.log(`create file action on ${url} for action ${action}`);
         this._router.get(url, (req, res) => {
             const { code, id } = req.params;
-            console.log("action params ->>", { code, id });
+            console.log("action params ->>" + code + " " + id);
             if (!Lock_1.default.instance.valid(id, code)) {
                 res.status(400).json({ error: "invalid session" });
                 return;

@@ -71,7 +71,7 @@ export default class APIv1 {
     this._router.get(url, (req, res) => {
       const { code, id } = req.params;
 
-      console.log("action params ->>", {code, id});
+      console.log("action params ->>" + code+" "+id);
       if(!Lock.instance.valid(id, code)) {
         res.status(400).json({error: "invalid session"});
         return;
