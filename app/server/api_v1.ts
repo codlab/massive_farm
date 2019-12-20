@@ -47,7 +47,8 @@ export default class APIv1 {
   private createFile(url: string, path: string) {
     console.log(`create file action on ${url} for path ${path}`);
     this._router.get(url, (req, res) => {
-      const { code, id } = req.params;
+      const { id } = req.params;
+      const { code } = req.query;
 
       console.log("file ->> ", {code, id});
       if(!Lock.instance.valid(id, code)) {
@@ -69,7 +70,8 @@ export default class APIv1 {
   private createAction(url: string, action: string, options?: Option[]) {
     console.log(`create file action on ${url} for action ${action}`);
     this._router.get(url, (req, res) => {
-      const { code, id } = req.params;
+      const { id } = req.params;
+      const { code } = req.query;
 
       console.log("action params ->> ", {code, id});
       if(!Lock.instance.valid(id, code)) {
@@ -81,7 +83,7 @@ export default class APIv1 {
   
       options && options.forEach(option => {
         const def = option.def ? options[option.def] : null;
-        opt[option.key] = req.params[option.key] || def;
+        opt[option.key] = req.query[option.key] || def;
       });
   
       activity.startActivity(id, config.activity.action, opt)
