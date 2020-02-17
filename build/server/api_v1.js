@@ -71,7 +71,9 @@ class APIv1 {
                 opt[option.key] = req.query[option.key] || def;
             });
             console.log("starting activity for ", { id, action: config.activity.action, opt });
-            activity.startActivity(id, config.activity.action, opt)
+            const intent_args = {};
+            Object.keys(opt).forEach(key => (null != opt[key] && undefined != opt[key]) && (intent_args[key] = opt[key]));
+            activity.startActivity(id, config.activity.action, intent_args)
                 .then(result => res.json(result))
                 .catch(err => {
                 console.error(err);
