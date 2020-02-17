@@ -56,7 +56,7 @@ class APIv1 {
         });
     }
     createAction(url, action, options) {
-        console.log(`create file action on ${url} for action ${action}`);
+        console.log(`create intent action on ${url} for action ${action}`);
         this._router.get(url, (req, res) => {
             const { id } = req.params;
             const { code } = req.query;
@@ -70,6 +70,7 @@ class APIv1 {
                 const def = option.def ? options[option.def] : null;
                 opt[option.key] = req.query[option.key] || def;
             });
+            console.log("starting activity for ", { id, action: config.activity.action, opt });
             activity.startActivity(id, config.activity.action, opt)
                 .then(result => res.json(result))
                 .catch(err => {
