@@ -45,6 +45,14 @@ export default class WebSocketServer extends Loggable {
       try {
         if (!!id(socket)) return;
 
+        socket.on("disconnect", () => {
+          const _uuid = id(socket);
+          if (!_uuid) return;
+          this.log(`removing disconnected ${_uuid}`);
+          this.#sockets.delete(_uuid);
+          this.#slaves.delete(_uuid);
+        });
+
         socket.on("command", (input: ClientCommand<any>) => this.onCommandReceivedForSocket(socket, input));
 
         socket.on("answer", (command: CommandAnswer<any>) => {

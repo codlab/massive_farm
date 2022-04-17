@@ -54,6 +54,14 @@ class WebSocketServer extends Loggable_1.default {
             try {
                 if (!!id(socket))
                     return;
+                socket.on("disconnect", () => {
+                    const _uuid = id(socket);
+                    if (!_uuid)
+                        return;
+                    this.log(`removing disconnected ${_uuid}`);
+                    __classPrivateFieldGet(this, _sockets).delete(_uuid);
+                    __classPrivateFieldGet(this, _slaves).delete(_uuid);
+                });
                 socket.on("command", (input) => this.onCommandReceivedForSocket(socket, input));
                 socket.on("answer", (command) => {
                     this.log("having data ->", command);
