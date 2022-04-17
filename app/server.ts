@@ -50,7 +50,7 @@ export default class ApiServer {
 
 
     this.app
-    .set('views', path.join(__dirname, '../public'))
+    .use(express.static(path.join(__dirname, '../public')))
     .use(body_parser.json())
     .use("/v1", this.api_v1.router());
     //this.app.listen(config?.server?.port || 8080);

@@ -33,7 +33,7 @@ class ApiServer {
         this.app = express_1.default();
         this.api_v1 = new api_v1_1.default(this.socketServer);
         this.app
-            .set('views', path_1.default.join(__dirname, '../public'))
+            .use(express_1.default.static(path_1.default.join(__dirname, '../public')))
             .use(body_parser_1.default.json())
             .use("/v1", this.api_v1.router());
         //this.app.listen(config?.server?.port || 8080);
