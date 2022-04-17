@@ -3,6 +3,7 @@ export interface Activity {
 }
 export interface RouteFile {
     url: string;
+    action: string;
     path: string;
 }
 export interface Option {
@@ -15,10 +16,18 @@ export interface RouteAction {
     options?: Option[];
 }
 export declare type Route = RouteFile | RouteAction;
+export declare type SocketSlave = {
+    url?: string;
+};
+export declare type SocketMaster = {
+    port?: number;
+};
+export declare type SocketConfig = SocketSlave | SocketMaster | undefined;
 export interface Server {
     discovery: boolean;
     port: number;
     mode?: "master" | "slave" | "normal";
+    socket?: SocketConfig;
 }
 export default interface Config {
     server: Server;

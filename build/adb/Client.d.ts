@@ -1,4 +1,5 @@
 /// <reference path="../../app/adb/adbkit.d.ts" />
+/// <reference types="node" />
 import { Device, Properties } from "adbkit";
 import Activity from "./Activity";
 import { Stream } from "stream";

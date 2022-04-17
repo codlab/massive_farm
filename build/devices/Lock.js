@@ -64,6 +64,6 @@ class Lock {
         return Promise.reject("can't release");
     }
 }
-Lock.instance = new Lock();
 exports.default = Lock;
+Lock.instance = new Lock();
 //# sourceMappingURL=Lock.js.map

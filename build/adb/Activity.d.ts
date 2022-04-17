@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import _Internal from "./_Internal";
 export default class Activity extends _Internal {
     private _client;

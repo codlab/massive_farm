@@ -1,7 +1,7 @@
 "use strict";
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
-}
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const request_1 = __importDefault(require("request"));
 const precall = (url, method, qs, json) => {
@@ -26,6 +26,7 @@ const precall = (url, method, qs, json) => {
                 //error ?
                 console.log(e);
             }
+            //@ts-ignore
             if (body && !body.error && resp.code != 401)
                 resolve(body);
             else

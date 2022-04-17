@@ -1,14 +1,12 @@
-/// <reference types="express" />
 import { Router } from "express";
-import { Properties } from "adbkit";
+import WebSocketServer from "./socket/WebSocketServer";
 export default class APIv1 {
+    private commandScheduler;
     private _router;
-    constructor();
-    private getFile(id, filePath);
-    private createFile(url, path);
-    private createAction(url, action, options?);
-    getProperties(deviceId: string): Promise<Properties>;
-    private initDevices();
-    private initRoutes();
+    constructor(commandScheduler: WebSocketServer);
+    private createFile;
+    private createAction;
+    private initDevices;
+    private initRoutes;
     router: () => Router;
 }

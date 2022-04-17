@@ -11,8 +11,8 @@ export default class DiscoveryService {
     constructor(listener?: OnServerFound, mode?: Mode);
     bind(): void;
     private _masterLoop;
-    private initMaster();
-    private broadcastAddress(interf);
-    private bindSearch(interf);
-    private bindServer(port);
+    private initMaster;
+    private broadcastAddress;
+    private bindSearch;
+    private bindServer;
 }

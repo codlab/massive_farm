@@ -1,0 +1,30 @@
+import { KeyValue } from './command/action/ActionInput';
+import { Socket } from "socket.io";
+import { DevicesOutput } from "./command/devices/DevicesAnswer";
+import { LockOutput } from "./command/lock/LockAnswer";
+import { ClientCommand } from "./execute/ClientCommand";
+import Loggable from "./Loggable";
+import { LockValidityOutput } from './command/lock_validity/LockValidityAnswer';
+import { Activity, Route } from '../Config';
+import { FileOutput } from './command/file/FileAnswer';
+export default class WebSocketServer extends Loggable {
+    #private;
+    private port;
+    constructor(port: number);
+    setConfiguration(activity: Activity, routes: Route[]): void;
+    private onCommandReceivedForSocket;
+    onCommandReceived<Input>(input: ClientCommand<Input>, socket?: Socket): Promise<any>;
+    private answer;
+    forwardDevices(): Promise<DevicesOutput>;
+    forwardUnlock(id: string, code: string): Promise<LockOutput>;
+    unlock(socket: Socket, id: string, code: string): Promise<LockOutput>;
+    forwardLock(id: string, code: string): Promise<LockOutput>;
+    lock(socket: Socket, id: string, code: string): Promise<LockOutput>;
+    forwardLockValidity(id: string, code: string): Promise<LockValidityOutput>;
+    lockValidity(socket: Socket, id: string, code: string): Promise<LockValidityOutput>;
+    forwardActionCommand(id: string, code: string, action: string, options: KeyValue[]): Promise<LockOutput>;
+    action(socket: Socket, id: string, code: string, action: string, options: KeyValue[]): Promise<LockOutput>;
+    forwardFileCommand(id: string, code: string, action: string, path: string): Promise<FileOutput>;
+    file(socket: Socket, id: string, code: string, action: string, path: string): Promise<FileOutput>;
+    devices(socket: Socket): Promise<DevicesOutput>;
+}
