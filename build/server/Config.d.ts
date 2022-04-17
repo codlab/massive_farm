@@ -28,6 +28,12 @@ export interface Server {
     port: number;
     mode?: "master" | "slave" | "normal";
     socket?: SocketConfig;
+    https?: {
+        use?: boolean;
+        key?: string;
+        cert?: string;
+        ca?: string;
+    };
 }
 export default interface Config {
     server: Server;

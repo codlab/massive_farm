@@ -11,5 +11,6 @@ export default class Client extends _Internal {
     activity(): Activity;
     listDevices(): Promise<Device[]>;
     pull(id: string | Device, filePath: string): Promise<Stream>;
+    stats(id: string | Device, filePath: string): Promise<Stream>;
     getProperties(id: string | Device): Promise<Properties>;
 }

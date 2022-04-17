@@ -22,6 +22,9 @@ class Client extends _Internal_1.default {
     pull(id, filePath) {
         return this._client.pull(this.id(id), filePath);
     }
+    stats(id, filePath) {
+        return this._client.pull(this.id(id), filePath);
+    }
     getProperties(id) {
         return this._client.getProperties(this.id(id));
     }
