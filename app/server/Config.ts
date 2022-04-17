@@ -35,7 +35,13 @@ export interface Server {
   discovery: boolean,
   port: number,
   mode?: "master"|"slave"|"normal",
-  socket?: SocketConfig
+  socket?: SocketConfig,
+  https?: {
+    use?: boolean,
+    key?: string,
+    cert?: string,
+    ca?: string
+  }
 }
 
 export default interface Config {

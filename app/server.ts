@@ -1,13 +1,16 @@
 import express, { Express } from "express";
 import body_parser from "body-parser";
 import { Server } from "http";
+import path from "path";
+import http from "http";
+import https from "https";
 
 import APIv1 from "./server/api_v1";
-import APIv1Router from "./server/api_v1_router";
 import DiscoveryService, { Mode, OnServerFound } from "./discovery";
 import Config, { SocketMaster, SocketSlave } from "./server/Config";
 import WebSocketClient from "./server/socket/WebSocketClient";
 import WebSocketServer from "./server/socket/WebSocketServer";
+import { readFileSync } from "fs";
 
 const config: Config = require("../config.json");
 
@@ -31,6 +34,7 @@ export default class ApiServer {
       return false;
     }
 
+    const httpsConfiguration = config?.server?.https;
     const socket = config?.server?.socket;
     const master = socket as SocketMaster;
     const client = socket as SocketSlave;
@@ -42,26 +46,40 @@ export default class ApiServer {
 
     this.app = express();
 
-    /*if("master" == mode) {
-      const api: APIv1Router = new APIv1Router();
-      this.api_v1 = api;
-      var callback: OnServerFound|null = (address, port) => {
-        api.onServer(address, port);
-      };
-      this.discovery = new DiscoveryService(callback, mode);
-    } else */
-    {
-      this.api_v1 = new APIv1(this.socketServer);
-      this.discovery = new DiscoveryService(undefined, mode);
-    }
+    this.api_v1 = new APIv1(this.socketServer);
+
 
     this.app
+    .set('views', path.join(__dirname, '../public'))
     .use(body_parser.json())
     .use("/v1", this.api_v1.router());
-    this.app.listen("8080");
+    //this.app.listen(config?.server?.port || 8080);
 
-    this.discovery.bind();
+    if (httpsConfiguration && !!httpsConfiguration.use) {
+      const credentials = {
+        key: undefined,
+        cert: undefined,
+        ca: undefined
+      };
+
+      [ "key", "cert", "ca"].forEach(key => {
+        if (!!httpsConfiguration[key]) credentials[key] = readFileSync(httpsConfiguration[key]);
+      });
+
+      this.server = https.createServer(credentials, this.app);
+    } else {
+      this.server = http.createServer(this.app);
+    }
     
+    const serverPort = config?.server?.port || 8080;
+    this.server.listen(serverPort, () => {
+      console.log(`web server running at ${serverPort}`);
+    });
+
+    if (!!(config?.server?.discovery)) {
+      this.discovery = new DiscoveryService(undefined, mode);
+      this.discovery.bind();
+    }    
 
     return true;
   }

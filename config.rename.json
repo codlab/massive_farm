@@ -1,7 +1,13 @@
 {
     "server": {
+        "https": {
+            "use": true,
+            "key": null,
+            "cert": null,
+            "ca": null
+        },
         "discovery": true,
-        "port": 8080,
+        "port": 443,
         "socket": {
             "port": 8888,
             "url": "http://127.0.0.1:8888"

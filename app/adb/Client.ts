@@ -27,6 +27,10 @@ export default class Client extends _Internal {
     return this._client.pull(this.id(id), filePath);
   }
 
+  stats(id: string|Device, filePath: string): Promise<Stream> {
+    return this._client.pull(this.id(id), filePath);
+  }
+
   getProperties(id: string|Device): Promise<Properties> {
     return this._client.getProperties(this.id(id));
   }
