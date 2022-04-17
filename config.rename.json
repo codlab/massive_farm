@@ -1,7 +1,11 @@
 {
     "server": {
         "discovery": true,
-        "port": 8080
+        "port": 8080,
+        "socket": {
+            "port": 8888,
+            "url": "http://127.0.0.1:8888"
+        }
     },
     "activity": {
         "action": "com.voxeet.intent.action.TEST_ACTION"
@@ -9,10 +13,12 @@
     "routes": [
         {
             "url": "/:id/status.json",
+            "action": "status",
             "path": "/storage/emulated/0/Android/data/com.voxeet.sample/cache/status.json"
         },
         {
             "url": "/:id/webrtc.json",
+            "action": "webrtc",
             "path": "/storage/emulated/0/Android/data/com.voxeet.sample/cache/webrtc.json"
         },
         {

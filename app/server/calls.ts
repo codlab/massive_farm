@@ -22,6 +22,7 @@ const precall = (url: string, method: string, qs?: any, json?: {}): Promise<{}|u
         //error ?
         console.log(e)
       }
+      //@ts-ignore
       if(body && !body.error && resp.code != 401) resolve(body);
       else reject({error : body ? body.error : "invalid result"});
     });
