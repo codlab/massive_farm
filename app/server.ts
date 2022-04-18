@@ -4,6 +4,9 @@ import { Server } from "http";
 import path from "path";
 import http from "http";
 import https from "https";
+import cors from "cors";
+//@ts-ignore
+import swaggerGenerator from 'express-swagger-generator';
 
 import APIv1 from "./server/api_v1";
 import DiscoveryService, { Mode, OnServerFound } from "./discovery";
@@ -50,6 +53,7 @@ export default class ApiServer {
 
 
     this.app
+    .use(cors())
     .use(express.static(path.join(__dirname, '../public')))
     .use(body_parser.json())
     .use("/v1", this.api_v1.router());
@@ -79,7 +83,39 @@ export default class ApiServer {
     if (!!(config?.server?.discovery)) {
       this.discovery = new DiscoveryService(undefined, mode);
       this.discovery.bind();
-    }    
+    }
+
+    if (!!config?.server?.swagger) {
+      let options = {
+        swaggerDefinition: {
+            info: {
+                description: 'Automatic documentation',
+                title: 'My Little Botnet',
+                version: '1.0.0',
+            },
+            host: 'opn0.fr',
+            basePath: '/v1',
+            produces: [
+                "application/json",
+                "application/xml"
+            ],
+            schemes: ['https'],
+            securityDefinitions: {
+                JWT: {
+                    type: 'apiKey',
+                    in: 'header',
+                    name: 'Authorization',
+                    description: "",
+                }
+            }
+        },
+        basedir: __dirname, //app absolute path
+        files: ['./server/api_v1.js'] //Path to the API handle folder
+      };
+      const expressSwagger = swaggerGenerator(this.app);
+      expressSwagger(options);
+    }
+
 
     return true;
   }

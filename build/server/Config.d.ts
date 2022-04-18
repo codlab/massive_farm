@@ -25,6 +25,7 @@ export declare type SocketMaster = {
 export declare type SocketConfig = SocketSlave | SocketMaster | undefined;
 export interface Server {
     discovery: boolean;
+    swagger: boolean;
     port: number;
     mode?: "master" | "slave" | "normal";
     socket?: SocketConfig;

@@ -78,6 +78,13 @@ export default class APIv1 {
     });
   }
 
+    /**
+     * List of available devices
+     * @route GET /devices.json
+     * @group devices - List devices
+     * @returns {object} 200 - Result
+     * @returns {Error}  default - Unexpected error
+     */
   private initDevices() {
     this._router.get("/devices.json", async (req, res) => {
       try {
@@ -89,6 +96,15 @@ export default class APIv1 {
       }
     });
 
+    /**
+     * Lock a specific device for 5min
+     * @route GET /{serial}/lock.json
+     * @group locks - Operations to register a device
+     * @param {string} serial.path.required - serial of the device
+     * @param {string} code.query.required - custom code used for the registration
+     * @returns {object} 200 - Result
+     * @returns {Error}  default - Unexpected error
+     */
     this._router.all("/:id/lock.json", async (req, res) => {
       try {
         var { id } = req.params;
@@ -104,6 +120,15 @@ export default class APIv1 {
       }
     });
 
+    /**
+     * Unlock a specific device for 5min
+     * @route GET /{serial}/unlock.json
+     * @group locks - Operations to register a device
+     * @param {string} serial.path.required - serial of the device
+     * @param {string} code.query.required - custom code which was previously used for lock
+     * @returns {object} 200 - Result
+     * @returns {Error}  default - Unexpected error
+     */
     this._router.all("/:id/unlock.json", async (req, res) => {
       try {
         var { id } = req.params;
