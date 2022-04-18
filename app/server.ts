@@ -4,6 +4,7 @@ import { Server } from "http";
 import path from "path";
 import http from "http";
 import https from "https";
+//@ts-ignore
 import cors from "cors";
 //@ts-ignore
 import swaggerGenerator from 'express-swagger-generator';
@@ -14,6 +15,7 @@ import Config, { SocketMaster, SocketSlave } from "./server/Config";
 import WebSocketClient from "./server/socket/WebSocketClient";
 import WebSocketServer from "./server/socket/WebSocketServer";
 import { readFileSync } from "fs";
+import { generate } from "./server/doc";
 
 const config: Config = require("../config.json");
 
@@ -54,6 +56,7 @@ export default class ApiServer {
 
     this.app
     .use(cors())
+    .get("/api-docs.json", generate(config))
     .use(express.static(path.join(__dirname, '../public')))
     .use(body_parser.json())
     .use("/v1", this.api_v1.router());
@@ -99,15 +102,7 @@ export default class ApiServer {
                 "application/json",
                 "application/xml"
             ],
-            schemes: ['https'],
-            securityDefinitions: {
-                JWT: {
-                    type: 'apiKey',
-                    in: 'header',
-                    name: 'Authorization',
-                    description: "",
-                }
-            }
+            schemes: ['https']
         },
         basedir: __dirname, //app absolute path
         files: ['./server/api_v1.js'] //Path to the API handle folder

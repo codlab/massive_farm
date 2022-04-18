@@ -1,4 +1,5 @@
 /// <reference path="adbkit.d.ts"/>
+//@ts-ignore
 import adb, { AdbClient, Device, Properties } from "adbkit";
 import Activity from "./Activity";
 import { Stream } from "stream";

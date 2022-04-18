@@ -1,3 +1,4 @@
+//@ts-ignore
 import { Device } from "adbkit";
 
 export default class _Internal {
