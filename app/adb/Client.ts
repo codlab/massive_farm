@@ -35,4 +35,24 @@ export default class Client extends _Internal {
   getProperties(id: string|Device): Promise<Properties> {
     return this._client.getProperties(this.id(id));
   }
+
+  // wifi ipv4 of the device, undefined when it is not connected to a wifi network
+  async getIp(id: string|Device): Promise<string|undefined> {
+    const output = await this.shellOutput(id, "ip -f inet addr show wlan0");
+    const match = output.match(/inet (\d+\.\d+\.\d+\.\d+)/);
+    return match ? match[1] : undefined;
+  }
+
+  // restart adbd in tcp mode, unless it already listens on this port (restarting drops current adb sessions)
+  async tcpip(id: string|Device, port: number): Promise<number> {
+    const properties = await this.getProperties(id);
+    if (`${properties["service.adb.tcp.port"]}` === `${port}`) return port;
+    return this._client.tcpip(this.id(id), port);
+  }
+
+  private async shellOutput(id: string|Device, command: string): Promise<string> {
+    const stream = await this._client.shell(this.id(id), command);
+    const output: Buffer = await adb.util.readAll(stream);
+    return output.toString();
+  }
 }

@@ -17,6 +17,7 @@ export default class DevicesAnswer extends AbstractCommand<DevicesOutput> {
   public async create(): Promise<DevicesOutput> {
     const devices = await this.client.listDevices();
     const properties = await Promise.all(devices.map(d => this.getProperties(d.id)));
+    const ips = await Promise.all(devices.map(d => this.getIp(d.id)));
 
     const lock: Lock = Lock.instance;
     var props:any = properties.map((p: Properties) => {
@@ -31,9 +32,19 @@ export default class DevicesAnswer extends AbstractCommand<DevicesOutput> {
       devices: devices.map((device, index) => ({
         ...device,
         infos: index < props.length ? props[index]: {},
+        ip: ips[index],
         available: lock.available(device.id || "")
       }))
     };
+  }
+
+  private async getIp(deviceId: string): Promise<string|undefined> {
+    try {
+      return await this.client.getIp(deviceId);
+    } catch(err) {
+      console.error(`get ip for ${deviceId}`, err);
+      return undefined;
+    }
   }
 
   private async getProperties(deviceId: string): Promise<Properties> {
