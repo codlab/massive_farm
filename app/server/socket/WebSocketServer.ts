@@ -20,6 +20,7 @@ import ActionCommand from './command/action/ActionCommand';
 import { FileInput } from './command/file/FileInput';
 import { FileOutput } from './command/file/FileAnswer';
 import FileCommand from './command/file/FileCommand';
+import DeviceRouter from './DeviceRouter';
 
 function id(socket: Socket): string|undefined|null {
   return (socket as any).customUuid;
@@ -33,6 +34,7 @@ export default class WebSocketServer extends Loggable {
   #server: Server;
   #sockets: Map<string, Socket> = new Map();
   #slaves: Map<string, Socket> = new Map();
+  #router = new DeviceRouter(this.#slaves, () => this.forwardDevices());
 
   #executor = new Executor();
 
@@ -165,22 +167,20 @@ export default class WebSocketServer extends Loggable {
 
   public async forwardDevices(): Promise<DevicesOutput> {
     this.log("forwardDevices");
-    const sockets = [...this.#slaves.values()];
-    const outputs = await Promise.all(sockets.map(s => this.devices(s)));
+    const slaves = [...this.#slaves.entries()];
+    const outputs = await Promise.all(slaves.map(([_, s]) => this.devices(s)));
     const output: DevicesOutput = { devices: [] };
     outputs.forEach(o => {
       o.devices.forEach(d => output.devices.push(d));
     });
 
+    this.#router.update(slaves.map(([slaveUuid], index) => ({ slaveUuid, devices: outputs[index].devices })));
     return output;
   }
 
   public async forwardUnlock(id: string, code: string): Promise<LockOutput> {
     this.log("forwardUnlock");
-    const sockets = [...this.#slaves.values()];
-    const outputs = await Promise.all(sockets.map(s => this.unlock(s, id, code)));
-    const valid = outputs.find(o => !!(o?.result));
-    return valid || { result: false };
+    return this.#router.route(id, s => this.unlock(s, id, code));
   }
 
   public async unlock(socket: Socket, id: string, code: string): Promise<LockOutput> {
@@ -196,11 +196,7 @@ export default class WebSocketServer extends Loggable {
 
   public async forwardLock(id: string, code: string): Promise<LockOutput> {
     this.log("forwardLock");
-    const sockets = [...this.#slaves.values()];
-    const outputs = await Promise.all(sockets.map(s => this.lock(s, id, code)));
-    console.log("outputs ?", outputs);
-    const valid = outputs.find(o => !!(o?.result));
-    return valid || { result: false };
+    return this.#router.route(id, s => this.lock(s, id, code));
   }
 
   public async lock(socket: Socket, id: string, code: string): Promise<LockOutput> {
@@ -216,10 +212,7 @@ export default class WebSocketServer extends Loggable {
 
   public async forwardLockValidity(id: string, code: string): Promise<LockValidityOutput> {
     this.log("forwardLockValidity");
-    const sockets = [...this.#slaves.values()];
-    const outputs = await Promise.all(sockets.map(s => this.lockValidity(s, id, code)));
-    const valid = outputs.find(o => !!(o?.result));
-    return valid || { result: false };
+    return this.#router.route(id, s => this.lockValidity(s, id, code));
   }
 
   public async lockValidity(socket: Socket, id: string, code: string): Promise<LockValidityOutput> {
@@ -235,10 +228,7 @@ export default class WebSocketServer extends Loggable {
 
   public async forwardActionCommand(id: string, code: string, action: string, options: KeyValue[]): Promise<LockOutput> {
     this.log("forwardActionCommand");
-    const sockets = [...this.#slaves.values()];
-    const outputs = await Promise.all(sockets.map(s => this.action(s, id, code, action, options)));
-    const valid = outputs.find(o => !!(o?.result));
-    return valid || { result: false };
+    return this.#router.route(id, s => this.action(s, id, code, action, options));
   }
 
   public async action(socket: Socket, id: string, code: string, action: string, options: KeyValue[]): Promise<LockOutput> {
@@ -254,10 +244,7 @@ export default class WebSocketServer extends Loggable {
 
   public async forwardFileCommand(id: string, code: string, action: string, path: string): Promise<FileOutput> {
     this.log("forwardFileCommand");
-    const sockets = [...this.#slaves.values()];
-    const outputs = await Promise.all(sockets.map(s => this.file(s, id, code, action, path)));
-    const valid = outputs.find(o => !!(o?.result));
-    return valid || { result: false };
+    return this.#router.route(id, s => this.file(s, id, code, action, path));
   }
 
   public async file(socket: Socket, id: string, code: string, action: string, path: string): Promise<FileOutput> {
