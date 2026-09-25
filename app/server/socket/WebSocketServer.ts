@@ -25,6 +25,10 @@ function id(socket: Socket): string|undefined|null {
   return (socket as any).customUuid;
 }
 
+function slaveId(socket: Socket): string|undefined|null {
+  return (socket as any).slaveUuid;
+}
+
 export default class WebSocketServer extends Loggable {
   #server: Server;
   #sockets: Map<string, Socket> = new Map();
@@ -50,7 +54,12 @@ export default class WebSocketServer extends Loggable {
           if (!_uuid) return;
           this.log(`removing disconnected ${_uuid}`);
           this.#sockets.delete(_uuid);
-          this.#slaves.delete(_uuid);
+
+          // only remove the slave entry if it still belongs to this socket (it may have reconnected meanwhile)
+          const _slaveUuid = slaveId(socket);
+          if (_slaveUuid && this.#slaves.get(_slaveUuid) === socket) {
+            this.#slaves.delete(_slaveUuid);
+          }
         });
 
         socket.on("command", (input: ClientCommand<any>) => this.onCommandReceivedForSocket(socket, input));
@@ -61,7 +70,7 @@ export default class WebSocketServer extends Loggable {
             this.#executor.tryUnlock(command);
           } catch(err) {
             this.log(`dropping call for data`, err);
-            socket.emit("answer", { uuid, data: { error: `command rejected for ${id(socket)}`} });
+            socket.emit("answer", { uuid: command?.uuid, error: `command rejected for ${id(socket)}` });
           }
         });
 
@@ -104,11 +113,12 @@ export default class WebSocketServer extends Loggable {
         const decoded = data as any;
         if (!decoded?.register || !decoded?.uuid) throw "invalid register info";
         const sock = this.#slaves.get(decoded.uuid);
-        if (sock) {
+        if (sock && sock !== socket && sock.connected) {
           throw "dropping call for register, socket is already known";
         }
 
-        this.#slaves.set((socket as any).customUuid, socket);
+        (socket as any).slaveUuid = decoded.uuid;
+        this.#slaves.set(decoded.uuid, socket);
         return {
           message: `command valid for ${id(socket)}`,
           activity: this.#activity,
