@@ -50,6 +50,13 @@ export default class Client extends _Internal {
     return this._client.tcpip(this.id(id), port);
   }
 
+  // restart adbd in usb mode if it listens over tcp, which drops the remote adb sessions
+  async usb(id: string|Device): Promise<boolean> {
+    const properties = await this.getProperties(id);
+    if (!Number(properties["service.adb.tcp.port"])) return false;
+    return this._client.usb(this.id(id));
+  }
+
   private async shellOutput(id: string|Device, command: string): Promise<string> {
     const stream = await this._client.shell(this.id(id), command);
     const output: Buffer = await adb.util.readAll(stream);

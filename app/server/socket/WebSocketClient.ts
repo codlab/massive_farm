@@ -62,7 +62,7 @@ export default class WebSocketClient extends Loggable {
         case "unlock": {
           this.log("received command for unlocking");
           const input = (<unknown> data) as UnlockInput;
-          const command = new UnlockAnswer(input?.id, input?.code);
+          const command = new UnlockAnswer(this.#client, input?.id, input?.code);
           const result = await command.create();
           this.#executor.reply(this.#socket, uuid, result);
         }; break;
