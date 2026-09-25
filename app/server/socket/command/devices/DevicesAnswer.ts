@@ -19,7 +19,7 @@ export default class DevicesAnswer extends AbstractCommand<DevicesOutput> {
     const properties = await Promise.all(devices.map(d => this.getProperties(d.id)));
 
     const lock: Lock = Lock.instance;
-    var props:any = properties.map(p => {
+    var props:any = properties.map((p: Properties) => {
       return {
         "brand": p["ro.product.brand"],
         "manufacturer": p["ro.product.manufacturer"],

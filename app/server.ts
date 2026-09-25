@@ -63,14 +63,11 @@ export default class ApiServer {
     //this.app.listen(config?.server?.port || 8080);
 
     if (httpsConfiguration && !!httpsConfiguration.use) {
-      const credentials = {
-        key: undefined,
-        cert: undefined,
-        ca: undefined
-      };
+      const credentials: { key?: Buffer, cert?: Buffer, ca?: Buffer } = {};
 
-      [ "key", "cert", "ca"].forEach(key => {
-        if (!!httpsConfiguration[key]) credentials[key] = readFileSync(httpsConfiguration[key]);
+      ([ "key", "cert", "ca"] as const).forEach(key => {
+        const file = httpsConfiguration[key];
+        if (!!file) credentials[key] = readFileSync(file);
       });
 
       this.server = https.createServer(credentials, this.app);

@@ -28,7 +28,7 @@ export default class ActionAnswer extends AbstractCommand<ActionOutput> {
     const valid = lock.valid(id, code);
     if(!valid)  throw "invalid session";
 
-    const intent_args = {};
+    const intent_args: { [key: string]: KeyValue["value"] } = {};
     options.forEach(({key, value}) => intent_args[key] = value);
     console.log("starting activity for ", {id, action, intent_args});
 
