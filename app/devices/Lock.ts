@@ -4,9 +4,12 @@ interface CountDown {
   remaining: number
 }
 
+export type OnExpired = (id: string) => void;
+
 export default class Lock {
 
   private locks: Map<string, CountDown> = new Map();
+  private expiredListeners: OnExpired[] = [];
 
   public static instance: Lock = new Lock();
   private constructor() {
@@ -26,7 +29,14 @@ export default class Lock {
       }
     });
 
-    list.forEach(key => this.locks.delete(key));
+    list.forEach(key => {
+      this.locks.delete(key);
+      this.expiredListeners.forEach(listener => listener(key));
+    });
+  }
+
+  onExpired(listener: OnExpired) {
+    this.expiredListeners.push(listener);
   }
 
   valid(id: string, code: string): boolean {

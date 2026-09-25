@@ -17,6 +17,7 @@ import { ActionInput } from './command/action/ActionInput';
 import ActionAnswer from './command/action/ActionAnswer';
 import { FileInput } from './command/file/FileInput';
 import FileAnswer from './command/file/FileAnswer';
+import Lock from '../../devices/Lock';
 
 
 export default class WebSocketClient extends Loggable {
@@ -38,6 +39,11 @@ export default class WebSocketClient extends Loggable {
     });
 
     this.#socket.on("command", (input: ClientCommand<any>) => this.onCommandReceived(input));
+
+    // an expired lock must drop the remote adb sessions, like an unlock
+    Lock.instance.onExpired(id => {
+      this.#client.usb(id).catch(err => this.log(`disable tcp for expired ${id}`, err));
+    });
   }
 
   private async onCommandReceived(input: ClientCommand<any>) {
